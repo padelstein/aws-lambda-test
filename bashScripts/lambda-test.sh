@@ -1,4 +1,5 @@
 #!/bin/bash
+# NOT FUNCTIONAL
 # tests a lambda function by using the curl bash command
 # -n required: the name of the lambda function as arg
 # -v required: the stage of the lambda function as arg {dev, test, prod}
