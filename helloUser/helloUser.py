@@ -10,7 +10,7 @@ import boto3
 import json
 
 
-def hello_user_handler(event, context):
+def helloUser_handler(event, context):
     '''Provide an event that contains the following keys:
 
       - operation: one of the operations in the operations dict below

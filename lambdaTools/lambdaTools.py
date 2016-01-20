@@ -11,17 +11,17 @@ import json
 
 
 def lambdaTools_handler(event, context):
-    '''Provide an event that contains the following keys:
+    '''Provide an event that may contain the following keys:
 
       - operation: one of the operations in the operations dict below
-      - tableName: required for operations that interact with DynamoDB
-      - payload: a parameter to pass to the operation being performed
+      - function_name: the name of the lambda function
+      - bucket_path: the path to the deployment zip file in the sqor-lambda-code s3 bucket
     '''
 
     operation = event['operation']
 
     operations = {
-        'create': lambda x: create_function(x.get('name'), x.get('role'), x.get('handler'), x.get('bucket') ),
+        'create': lambda x: create_function(x.get('function_name'), x.get('bucket_path') ),
         'ping': lambda x: 'pong'
     }
 
@@ -30,7 +30,7 @@ def lambdaTools_handler(event, context):
     else:
         raise ValueError('Unrecognized operation "{}"'.format(operation))
     
-def create_function(function_name, function_role="arn:aws:iam::742333168435:role/lambdaFULL", function_handler, s3_bucket):
+def create_function(function_name, s3_bucket_path):
     '''creates a lambda function using the parameters:
     
         - function_name: the desired name of the Lambda Function
@@ -43,11 +43,11 @@ def create_function(function_name, function_role="arn:aws:iam::742333168435:role
     
     response = client.create_function(
          FunctionName=function_name,
-         Runtime='python.2.7',
-         Role=function_role,
-         Handler=function_handler,
-         Code=s3_bucket,
+         Runtime='python2.7',
+         Role='arn:aws:iam::742333168435:role/lambdaFULL',
+         Handler="{}.{}_handler".format(function_name, function_name),
+         Code={"S3Bucket":"sqor-lambda-code","S3Key":s3_bucket_path},
          Publish=False        
     )
     
-    return "successfully created the {} Lambda function at {}".format(response.get('FunctionName'), response.get('FunctionARN') )
+    return "successfully created the {} Lambda function at {}".format(response.get('FunctionName'), response.get('FunctionArn') )
